@@ -3,9 +3,6 @@
 
 /* Requirements:
  * 
- * 
- * To finish:
- * 
  * Merge two or more arrays
  * Does not change existing arrays
  * It does not skip holes
@@ -44,6 +41,7 @@ function concat() {
 }
 
 
+
 tests({
 	'It should return an array': function() {
 		var concatArray = concat();
@@ -54,8 +52,19 @@ tests({
 		var concatArray = concat(randomArray);
 		eq(randomArray !== concatArray, true);
 	},
-	'It should accept any number of arguments.': function() {},
-	'If one argument and argument is array, return a new array equal to the argument.': function() {
+	'It should accept any number of arguments.': function() {
+		var concatArray = concat(1, 2, [3, 4], 5, [6, 7]);
+		eq(concatArray.length, 7);
+	},
+	'If no arguments, should return an empty array.': function() {
+		var concatArray = concat();
+		eq(concatArray.length, 0);
+	},
+	'If one argument and argument is not array, return a new array with element equal to argument.': function() {
+		var concatArray = concat(1);
+		eq(concatArray[0], 1);
+	},
+	'If one argument and argument is array, return a new array with element equal to element(s) in argument array.': function() {
 		var concatArray = concat([1]);
 		eq(concatArray[0], 1);
 	},
@@ -74,7 +83,7 @@ tests({
 		concatArray[0][0] = 2;
 		eq(array1[0][0], 2);
 	},
-	'If object references in array used to concat change, concatArray should reflect those changes.': function() {
+	'If object references in array used to concat are changed, concatArray should reflect those changes.': function() {
 		var array1 = [[1]];
 		var concatArray = concat(array1);
 
@@ -103,7 +112,7 @@ tests({
 		eq(typeof concatArray[3] === 'boolean', true);
 		eq(Array.isArray(concatArray[4]) === true, true);
 	},
-	'If hole at end of argument, should still pass in the hole.': function() {
+	'If hole at end of array passed as argument, should still pass in the hole.': function() {
 		var concatArray = concat([1], [1,,]);
 		eq(concatArray.length === 3, true);
 		eq(2 in concatArray, false);
