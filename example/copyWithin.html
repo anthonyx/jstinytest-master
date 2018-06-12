@@ -1,0 +1,173 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+// function copyWithin(array, target, start, end) {
+// 	var originalArray = array;
+// 	var startingIndex = target;
+// 	var copyIndex = start;
+// 	for (copyIndex; copyIndex < end; copyIndex++) {
+// 		originalArray[startingIndex] = originalArray[start]
+// 	}
+// 	return originalArray;
+// }
+
+/* Requirements:
+ * It should return an array.
+ * It should not modify the size of the array
+ * It should return the same array
+ * It should copy part of the array to another location
+ * If no arguments, return the same array
+ * It should accept a target as the first parameter
+ * It can accept an optional start as the second argument
+ * It can accept an optional end as the third argument
+ * If target is greater than array length, it will not copy
+ * If target is positioned after start, copied sequence will be trimmed to fit array length
+ * If target is negative, target will be counted from the end
+ * If start is negative, start will be counted from the end
+ * If start is omitted, copy starts from 0
+ * If end is negative, end will be counted from the end
+ * If end is omitted, copy until the end of array
+ * If start index is after end index, do nothing
+ */
+
+
+
+function copyWithin(array, target, start, end) {
+	
+	function indexConverter(argument) {
+		// If negative
+		if(argument < 0) {
+			argument = argument + array.length;
+		} else {
+			// If string
+			if(typeof argument === 'string') {
+				argument = 0;
+			}
+		}
+
+		return argument;
+	}
+
+
+	target = indexConverter(target) || 0;
+	start = indexConverter(start) || 0;
+	end = indexConverter(end) || array.length;
+
+
+	// In case target is longer than array.length, do nothing.
+	if(target >= array.length) {
+		return array;
+	}
+
+	// In case end is not defined, set end to array.length.
+	if(Boolean(end) === false || end > array.length)  {
+		end = array.length;
+	}
+
+	var copiedArray = array.slice();
+	var numberOfTimesToRunLoop = end - start;
+
+	for (var i = 0; i < numberOfTimesToRunLoop; i++) {
+		// Run only if target is less than array.length
+		if (target < array.length) {
+			// Run only if target is defined
+			if(start in copiedArray) {
+				array[target] = copiedArray[start];
+			} else {
+				delete array[target];
+			}
+
+			target++;
+			start++;
+		}
+	}
+
+	return array;
+}
+
+
+
+tests({
+	'It should return an array.': function() {
+		var copiedArray = copyWithin([1, 2, 3]);
+		eq(Array.isArray(copiedArray), true);
+	},
+	'It should not modify the size of the array.': function() {
+		var copiedArray = copyWithin([1, 2, 3], 0);
+		eq(copiedArray.length, 3);
+	},
+	'It should return the same array.': function() {
+		var originalArray = [1, 2, 3]
+		var copiedArray = copyWithin(originalArray, 0);
+		eq(copiedArray, originalArray);
+	},
+	'It should copy within.': function() {
+		var copiedArray = copyWithin([1, 2], 0, 1);
+		for(var i = 0; i < copiedArray.length; i++) {
+			eq(copiedArray[i], 2);
+		}
+	},
+	'If no arguments, do nothing and return same array.': function() {
+		var originalArray = [1, 2, 3];
+		var copiedArray = copyWithin(originalArray);
+		eq(copiedArray, originalArray);
+	},
+	'If target is equal to or greater than array length, it should not copy.': function() {
+		var copiedArray = copyWithin([1, 2], 3);
+		eq(copiedArray[0], 1);
+		eq(copiedArray[1], 2);
+	},
+	'If target is positioned after start, copied sequence will be trimmed to fit array length.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 3, 2, 7);
+		eq(copiedArray.length, 5);
+
+	},
+	'If target is negative, target will be counted from the end.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], -2, 2, 3);
+		eq(copiedArray[3], 3);
+	},
+	'If start is negative, start will be counted from the end.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 0, -2, 4);
+		eq(copiedArray[0], 4);
+	},
+	'If start is omitted, copy starts from index 0.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 2);
+		eq(copiedArray[2], 1);
+	},
+	'If end is negative, end will be counted from the end.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 0, 2, -2);
+		eq(copiedArray[0], 3);
+	},
+	'If end is omitted, copy until the end of array.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 2, 3);
+		eq(copiedArray[3], 5);
+		eq(copiedArray[4], 5);
+	},
+	'If start index is after end index, do nothing and return same array.': function() {
+		var copiedArray = copyWithin([1, 2, 3], 2, 3, 2);
+		eq(copiedArray[0], 1);
+		eq(copiedArray[1], 2);
+		eq(copiedArray[2], 3);
+	},
+	'If argument is boolean, converts to corresponding number for use in target, start, end.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 3, false, true);
+		eq(copiedArray[3], 1);
+	},
+	'If argument is Nan, default to 0.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 'hi', 2, 3);
+		eq(copiedArray[0], 3);
+	},
+	'It should not include the element at array[end] when copying the array.': function() {
+		var copiedArray = copyWithin([1, 2, 3, 4, 5], 3, 1, 2);
+		eq(copiedArray[4], 5);
+	},
+	'It should copy holes.': function() {
+		var copiedArray = copyWithin([1, 2, , 4, 5], 4, 2, 3);
+		eq(4 in copiedArray, false);
+	}
+});
+
+</script>
