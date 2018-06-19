@@ -1,0 +1,126 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+// function includes(array, searchElement, fromIndex) {
+// 	var i = 0;
+// 	if(fromIndex) {
+// 		if(fromIndex + array.length < 0) 
+// 		i = fromIndex;
+// 	}
+
+// 	for(i; i < array.length; i++) {
+// 		if(isNaN(searchElement) && isNaN(array[i])) {
+// 			return true;
+// 		} 
+// 		if(array[i] === searchElement) {
+// 			return true;
+// 		}
+// 	}
+
+// 	return false;
+// }
+
+/* Requirements:
+ * Determines whether an array includes a certain element
+ * Returns a Boolean value, true or false
+ * Uses sameValueZero algorithm to determine whether element is found
+ * Accepts two parameters: searchElement and optional fromIndex
+ * searchElement is the element to search for
+ * fromIndex is the position in the array to begin searching
+ * fromIndex defaults to 0 if not given
+ * If fromIndex is greater than or equal to length of the array, false is returned
+ * If fromIndex is greater than or equal to length of the array, array will not be searched
+ * If fromIndex is negative, a computed index will be calculated
+ * If fromIndex is negative, a computed index = array.length + fromIndex
+ * If computed index is less than 0, entire array is searched
+ * includes can be applied to other kinds of objects, array-like objects
+ * Using includes on an array with NaN with searchElement = NaN will return true
+ */
+
+function includes(array, searchElement, fromIndex) {
+	var i = 0;
+	if(fromIndex) {
+		if(fromIndex < 0) {
+			var computedIndex = array.length + fromIndex;
+			if(computedIndex >= 0) {
+				i = computedIndex;
+			}
+		} else {
+			i = fromIndex;
+		}		
+	}
+
+
+	for(i; i < array.length; i++) {
+		// NaN === NaN evaluates to false, but with the sameValueZero algorithm, it should evaluate to true
+		// This is used to treat that edge case
+		if(String(searchElement) === 'NaN' && String(array[i]) === 'NaN') {
+			return true;
+		}
+		if(array[i] === searchElement) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+tests({
+	'It should return a Boolean value.': function() {
+		var returnValue = typeof includes([]);
+		eq(returnValue, 'boolean');
+	},
+	'If searchElement does not exist, it should return false.': function() {
+		var returnValue = includes([]);
+		eq(returnValue, false);
+	},
+	'If searchElement exists within array, it should return true.': function() {
+		var returnValue = includes([1, 2, 3], 2);
+		eq(returnValue, true);
+	},
+	'If searchElement does not exist within array, it should return false.': function() {
+		var returnValue = includes([1, 2, 3], 4);
+		eq(returnValue, false);
+	},
+	'If fromIndex exists and is positive/zero, it should start searching at that index.': function() {
+		var returnValue = includes([1, 2, 3, 4], 2, 2);
+		eq(returnValue, false);
+	},
+	'If fromIndex is negative, a computed index will be calculated as array.length + fromIndex. If computed index is positive/zero, it should started searching at that index.': function() {
+		var returnValue = includes([1, 2, 3], 2, -1)
+		eq(returnValue, false)
+	},
+	'If fromIndex is negative, a computed index will be calculated. If computed index is negative, entire array is searched.': function() {
+		var returnValue = includes([1, 2, 3], 2, -5)
+		eq(returnValue, true)
+	},
+	'Includes should execute on array-like objects.': function() {
+		(function() {
+			// For call: call(optionalThis, 1st argument, 2nd argument)
+			// This is why we are passing in this first as a placeholder
+			var case1 = includes.call(this, arguments, 'a'); // true
+			var case2 = includes.call(this, arguments, 'd'); // false
+			eq(case1, true);
+			eq(case2, false);
+		})('a','b','c');
+	},
+	'Using includes on an array with NaN with searchElement = NaN will return true.': function() {
+		var returnValue = includes([NaN], NaN);
+		eq(returnValue, true);
+	},
+	'It should determine whether an array includes a specified element.': function() {
+		var returnValue1 = includes([1, 2, 3, 4, 5], 3);
+		var returnValue2 = includes([1, 2, 3, 4, 5], 6);
+		eq(returnValue1, true);
+		eq(returnValue2, false);
+	},
+	'It should not skip holes.': function() {
+		var returnValue = includes([1, , 2, 3], 2, 3);
+		eq(returnValue, false);
+	}
+});
+
+</script>
