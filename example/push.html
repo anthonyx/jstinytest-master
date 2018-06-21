@@ -26,45 +26,45 @@
  * 
  */
 
-function push(array) {
+Array.prototype.myPush = function push() {
 
 	// Check for length property on passed in argument
 	var startingIndex;
-	if(typeof array.length !== 'undefined') {
-		startingIndex = array.length;
+	if(typeof this.length !== 'undefined') {
+		startingIndex = this.length;
 	} else {
 		startingIndex = 0;
-		array.length = 0;
+		this.length = 0;
 	}
 
 	// Check if call/apply is being used
 	// If so, i needs to be incremented based on whether the first element in arguments is the array itself
 	var i = 0;
-	if (arguments[0] === array) {
+	if (arguments[0] === this) {
 		i++;
 	}
 
 	// Assign each argument to the end of the array
 	for (i; i < arguments.length; i++) {
-		array[startingIndex] = arguments[i];
+		this[startingIndex] = arguments[i];
 		startingIndex++
 		// If we are pushing to an object that is not an array, increment the length property
-		if(Array.isArray(array) === false) {
-			array.length++;
+		if(Array.isArray(this) === false) {
+			this.length++;
 		}
 	}
 
-	return array.length;
+	return this.length;
 }
 
 tests({
 	'It should append elements to the end of the array.': function() {
 		var pushArray = [1, 2, 3];
-		push(pushArray, 4);
+		pushArray.myPush(4);
 		eq(pushArray[3], 4);
 	},
 	'It should return the new length property of the array.': function() {
-		var returnValue = push([1, 2, 3], 8);
+		var returnValue = [1, 2, 3].myPush(8);
 		eq(returnValue, 4);
 	},
 	'It should work on objects resembling arrays.': function() {
@@ -74,7 +74,7 @@ tests({
 		    addElem: function addElem(elem) {
 		        // obj.length is automatically incremented 
 		        // every time an element is added.
-		        push.call(this, this, elem);
+		        [].myPush.call(this, elem);
 		    }
 		};
 		obj.addElem({});
@@ -83,12 +83,12 @@ tests({
 	},
 	'If length property cannot be converted to number, start at index 0.': function() {
 		var pushObject = {};
-		push(pushObject, 5);
+		[].myPush.call(pushObject, 5);
 		eq(pushObject[0], 5);
 	},
 	'If length property does not exist, it should be created.': function() {
 		var pushObject = {};
-		push(pushObject, 5);
+		[].myPush.call(pushObject, 5);
 		eq(pushObject.length, 1);
 	},
 	'Push can be used to merge two arrays.': function() {
@@ -96,9 +96,10 @@ tests({
 		// This functionality is not easily accomplished with apply since my push needs to first pass in array before the arguments
 		// Need to think of an alternative test method, although I do believe the existing code will pass the test
 		var vegetables = ['parsnip', 'potato'];
+		var moreVegetables = ['celery', 'beetroot'];
 
 		// Merge the second array into the first one
-		push.apply(this, [vegetables, 'celery', 'beetroot']);
+		[].myPush.apply(vegetables, moreVegetables);
 
 		eq(vegetables[0], 'parsnip');
 		eq(vegetables[1], 'potato');
