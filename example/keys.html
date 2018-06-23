@@ -1,0 +1,110 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+
+/* Notes:
+ * function*: defines a generation function, which returns a generator object
+ * Generators: 
+    * Functions which can be exited and later re-entered
+    * Their context (variable bindings) will be saved across re-entrances
+    * Calling a generator function does not execute its body immediately
+    * An iterator object for the function is returned instead. 
+    * When the iterator's next() method is called, the generator function's body is executed until the first yield expression
+    * First yield will specify the value to be returned
+    * Or if it is yield*, then it will delegate to another generator function
+    * Iterator Objects:
+        * An object returned from generators with a next method
+        * Next method will return an object with two properties, value and done
+            * Value: yielded value
+            * Done: boolean value depending on whether we've reached the end
+    * for...of statement:
+        * iterates over each property of the object
+ */
+
+/* Requirements:
+ * The keys() method returns a new Array Iterator object that contains the keys for each index in the array
+ * Returns a new Array iterator object
+ * Key iterator does not ignore holes
+ */
+
+function keys(array) {
+    var nextIndex = 0;
+    
+    return {
+       next: function() {
+            if(nextIndex < array.length) {
+                return {
+                    value: nextIndex++,
+                    done: false
+                }
+            } else {
+                return {
+                    done: true
+                }
+            }
+       }
+    }
+}
+
+tests({
+    'It should return an object.': function() {
+        var returnValue = keys([]);
+        eq(typeof returnValue, 'object');
+    },
+    'The returned object should have a next method.': function() {
+        var returnValue = keys([]);
+        eq(returnValue.next !== undefined, true); 
+    },
+    'Running the next method should return an object.': function() {
+        var returnValue = keys([]).next();
+        eq(typeof returnValue, 'object');
+    },
+    'If array is not empty, the object returned by the next method should have a value property.': function() {
+        var returnValue = keys([1]).next();
+        eq(returnValue.value !== undefined, true);
+    },
+    'If array is empty, the object returned by the next method should not have a value property.': function() {
+        var returnValue = keys([]).next();
+        eq(returnValue.value === undefined, true);
+    },
+    'The value property from the object returned by next should first equal the first index, and then be incremented up.': function() {
+        var returnValue = keys([1, 2, 3]).next;
+        eq(returnValue().value, 0);
+        eq(returnValue().value, 1);
+    },
+    'The value property from the object returned by next should be undefined when incremented more than array.length times.': function() {
+        var returnValue = keys([1, 2, 3]).next;
+        eq(returnValue().value, 0);
+        eq(returnValue().value, 1);
+        eq(returnValue().value, 2);
+        eq(returnValue().value, undefined);
+    },
+    'The object returned by the next should have a done property.': function() {
+        var returnValue = keys([]).next();
+        eq(returnValue.done !== undefined, true);
+    },
+    'The done property from the next object should be a boolean value.': function() {
+        var returnValue = keys([]).next().done;
+        eq(typeof returnValue, 'boolean');
+    },
+    'The done property from the next object will be false if the calculated nextIndex is less than array.length.': function() {
+        var returnValue = keys([1]).next().done;
+        eq(returnValue, false);
+    },
+    'The done property from the next object will be true if the calculated nextIndex is equal to or greater than array.length.': function() {
+        var returnValue = keys([1]).next;
+        eq(returnValue().done, false);
+        eq(returnValue().done, true);
+    },
+    'The keys operator should not exclude holes.': function() {
+        var returnValue = keys([,,]).next;
+        eq(returnValue().done, false);
+        eq(returnValue().done, false);
+        eq(returnValue().done, true);
+    }
+});
+
+</script>
