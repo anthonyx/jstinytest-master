@@ -1,0 +1,81 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+// function reverse(array) {
+//     var reverseArray = [];
+
+//     var lastIndex = array.length - 1;
+
+
+//     for(var i = 0; i < array.length; i++) {
+//         if(i in array) {
+//             reverseArray[i] = array[lastIndex];
+//         }
+        
+//         lastIndex--;
+//     }
+
+//     array = reverseArray;
+//     return array;
+// }
+
+/* Requirements:
+ * Reverses an array in place
+ * Returns the reversed array
+ * It should return the same array
+ * It should not skip holes
+ */
+
+function reverse(array) {
+    var originalArray = array.slice();
+
+    var lastIndex = originalArray.length - 1;
+
+
+    for(var i = 0; i < originalArray.length; i++) {
+        if(i in originalArray) {
+            array[lastIndex] = originalArray[i];
+        } else {
+            delete array[lastIndex];
+        }
+
+        lastIndex--;
+    }
+
+    return array;
+}
+
+tests({
+    'It should return an array.': function() {
+        var returnValue = reverse([]);
+        eq(Array.isArray(returnValue), true);
+    },
+    'It should return the same array.': function() {
+        var randomArray = [1, 2, 3];
+        var reverseArray = reverse(randomArray);
+        eq(randomArray, reverseArray);
+    },
+    'It should reverse the array.': function() {
+        var returnValue = reverse([1, 2, 3]);
+        eq(returnValue[0], 3);
+        eq(returnValue[1], 2);
+        eq(returnValue[2], 1);    
+    },
+    'It should not skip holes at the beginning of the array.': function() {
+        var returnValue = reverse([,1, 2]);
+        eq(2 in returnValue, false);
+    },
+    'It should not skip holes in the middle of the array.': function() {
+        var returnValue = reverse([1,, 2]);
+        eq(1 in returnValue, false);
+    },
+    'It should not skip holes at the end of the array.': function() {
+        var returnValue = reverse([1, 2,,]);
+        eq(0 in returnValue, false);
+    }
+});
+
+</script>

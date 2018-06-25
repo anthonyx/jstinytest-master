@@ -1,0 +1,60 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+
+/* Requirements:
+ * The bind() method creates a new function that, when called, has its this keyword set to the provided value
+ * The first argument passed in is the this value of the returned function
+ * The subsequent arguments passed in are used to prepend arguments to the bound function
+ * The this value passed to bind is ignored if the function is called using the new operator
+ * Returns a copy of the given function with the specified this value and initial arguments
+ * A Bound Function (BF) has the following internal properties:
+    * BoundTargetFunction
+    * BoundThis
+    * BoundArguments
+    * Call
+ * If we have bound a function with a specified this and a specified argument, the next time the function is run it will first execute on the specified argument before executing on any other arguments
+    * Example: 
+        function list() {
+          return Array.prototype.slice.call(arguments);
+        }
+
+        var list1 = list(1, 2, 3); // [1, 2, 3]
+
+        // Create a function with a preset leading argument
+        var leadingThirtysevenList = list.bind(null, 37);
+
+        var list2 = leadingThirtysevenList(); 
+        // [37]
+
+        var list3 = leadingThirtysevenList(1, 2, 3);
+        // [37, 1, 2, 3]
+ * 
+ */
+
+ /* Problems encountered:
+  * Unable to manually reset the value of this, tried deleting this but it does not seem to work
+  * 
+  */
+
+// Example function:
+
+function returnThis() {
+    return this;
+}
+
+
+function myBind(bindFunction, optionalThis) {
+    var this = optionalThis;
+
+    return bindFunction;
+}
+
+tests({
+
+});
+
+</script>
