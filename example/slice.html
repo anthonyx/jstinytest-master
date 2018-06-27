@@ -1,0 +1,167 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+
+/* Requirements:
+ * The slice() method returns a shallow copy of a portion of an array into a new array object selected from begin to end
+ * The original array will not be modified
+ * Accepts optional start and end parameters
+ * Begin: zero based index at which to begin extraction
+ * If begin is undefined, begin at beginning of sequence
+ * If begin is greater than length of sequence, return empty array
+ * End: zero based index before which to begin extraction
+ * If end is omitted, extracts through end of sequence
+ * If end is greater than length of sequence, extracts through end of sequence
+ * We can use negative indexes to offset from end of the sequence
+ * Object references are copied to the shallow copy as well
+ * For strings, numbers and booleans, these are copied as values
+ * It should not skip holes
+ * If passing in booleans, strings, arrays, or objects it will still work
+ */
+
+Array.prototype.mySlice = function(begin, end) {
+    var sliceArray = [];
+    var sliceIndex = 0;
+
+    // If begin is not an array, but is an object, reset value to 0;
+    if(Array.isArray(begin) === false && typeof begin === 'object') {
+        begin = 0;
+    } else if(typeof begin === 'boolean') {
+        begin = Number(begin);
+    } else if (typeof begin === 'string') {
+        begin = 0;
+    }
+
+    // If end is not an array, but is an object, reset value to 0;
+    if(Array.isArray(end) === false && typeof end === 'object') {
+        end = 0;
+    } else if(typeof end === 'boolean') {
+        end = Number(end);
+    } else if (typeof end === 'string') {
+        end = 0;
+    }
+
+    if(begin < 0) {
+        begin = this.length + begin;
+    } else if(!begin) {
+        begin = 0;
+    } 
+
+    if(end < 0) {
+        end = this.length + end;
+    } else if(!end) {
+        end = this.length;
+    }
+    // begin = begin || 0;
+    // end = end || this.length;
+    for(begin; begin < end; begin++) {
+        if(begin in this) {
+            sliceArray[sliceIndex] = this[begin];   
+        }
+        sliceIndex++;
+    }
+
+    return sliceArray;
+}
+
+tests({
+    'It should return an array.': function() {
+        var returnValue = [].mySlice();
+        eq(Array.isArray(returnValue), true);
+    },
+    'It should return a different array.': function() {
+        var originalArray = [];
+        var returnValue = originalArray.mySlice();
+        eq(originalArray !== returnValue, true);
+    },
+    'The original array should not be modified.': function() {
+        var originalArray = [1, 2, 3];
+        var returnValue = originalArray.mySlice(1, 3);
+        for (var i = 0; i < originalArray.length; i++) {
+            eq(originalArray[i] === i + 1, true); 
+        }
+    },
+    'If begin is omitted, it should start at beginning of the array.': function() {
+        var returnValue = [1, 2, 3].mySlice();
+        eq(returnValue[0], 1);
+    },
+    'If begin is undefined, it should start at the beginning of the array.': function() {
+        var returnValue = [1, 2, 3].mySlice(undefined);
+        eq(returnValue[0], 1);
+    },
+    'If begin exists and is a number less than last index, it should start at that index.': function() {
+        var returnValue = [1, 2, 3].mySlice(1);
+        eq(returnValue[0], 2);
+    },
+    'If begin exists and is a number larger than last index, it should return an empty array.': function() {
+        var returnValue = [1, 2, 3].mySlice(5);
+        eq(returnValue.length, 0);
+    },
+    'If end is omitted, it should end at the end of the array.': function() {
+        var returnValue = [1, 2, 3].mySlice();
+        eq(returnValue[2], 3);
+    },
+    'If end is undefined, it should end at the end of the array.': function() {
+        var returnValue = [1, 2, 3].mySlice(0, undefined);
+        eq(returnValue[2], 3);
+    },
+    'If end exists and is a number less than last index, it should end before that index.': function() {
+        var returnValue = [1, 2, 3].mySlice(0, 1);
+        eq(returnValue[0], 1);
+        eq(returnValue[1], undefined);
+    },
+    'If end exists and is a number larger than last index, it should end at the end of the array.': function() {
+        var returnValue = [1, 2, 3].mySlice(0, 5);
+        for (var i = 0; i < 3; i++) {
+            eq(returnValue[i] === i + 1, true); 
+        }
+    },
+    'If negative numbers are used as parameters, it should start offset from the end of the sequence.': function() {
+        var returnValue = [1, 2, 3].mySlice(-3, -1);
+        for (var i = 0; i < 2; i++) {
+            eq(returnValue[i] === i + 1, true); 
+        }
+    },
+    'It should not skip holes.': function() {
+        var returnValue = [, 1, ,2, ,].mySlice();
+        eq(0 in returnValue, false);
+        eq(1 in returnValue, true);
+        eq(2 in returnValue, false);
+        eq(3 in returnValue, true);
+        eq(4 in returnValue, false);
+
+    },
+    'If passing in non-number values as arguments, in several cases it will still run.': function() {
+        // Case 1: Array
+        var arrayReturn = [1, 2, 3].mySlice([0]);
+        for (var i = 0; i < 3; i++) {
+            eq(arrayReturn[i] === i + 1, true); 
+        }
+
+        // Case 2: Empty Object
+        var objectReturn = [1, 2, 3].mySlice({});
+        for (var i = 0; i < 3; i++) {
+            eq(objectReturn[i] === i + 1, true); 
+        }
+
+        // Case 3: Boolean
+        var trueReturn = [1, 2, 3].mySlice(true);
+        eq(trueReturn[0], 2);
+        eq(trueReturn[1], 3);
+
+        var falseReturn = [1, 2, 3].mySlice(false);
+        for (var i = 0; i < 3; i++) {
+            eq(falseReturn[i] === i + 1, true); 
+        }
+        // Case 4: String
+        var stringReturn = [1, 2, 3].mySlice('string');
+        for (var i = 0; i < 3; i++) {
+            eq(stringReturn[i] === i + 1, true); 
+        }
+    }
+});
+
+</script>

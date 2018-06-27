@@ -1,0 +1,41 @@
+Array.prototype Method Testing:
+
+Mutator Methods:
+(x) copyWithin
+( ) fill
+( ) pop
+(x) push
+(x) reverse
+(x) shift
+( ) sort
+( ) splice
+( ) unshift
+
+Accessor Methods:
+(x) concat
+(x) includes
+( ) indexOf
+( ) join
+( ) lastIndexOf
+( ) slice
+( ) toSource
+( ) toString
+( ) toLocaleString
+
+Iterator Methods:
+( ) entries
+( ) every
+(x) filter
+(x) find
+( ) findIndex
+(x) forEach
+(x) keys
+(x) map
+(x) reduce
+(x) reduceRight
+( ) some
+( ) values
+( ) [@@iterator]
+
+
+
