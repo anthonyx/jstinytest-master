@@ -2,12 +2,12 @@ Array.prototype Method Testing:
 
 Mutator Methods:
 (x) copyWithin
-( ) fill
-( ) pop
+(ES6) fill
+(x) pop
 (x) push
 (x) reverse
 (x) shift
-( ) sort
+(IP) sort
 ( ) splice
 ( ) unshift
 
@@ -17,7 +17,7 @@ Accessor Methods:
 ( ) indexOf
 ( ) join
 ( ) lastIndexOf
-( ) slice
+(x) slice
 ( ) toSource
 ( ) toString
 ( ) toLocaleString

@@ -1,0 +1,66 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+
+/* Requirements:
+ * Removes the last element from an array and returns that element
+ * Changes length of the array
+ * Mutates the original array
+ * Intentionally generic
+ * Calling pop on empty array will return undefined
+ */
+
+Array.prototype.myPop = function() {
+    if(this.length > 0) {
+        var lastIndex = this.length - 1;
+        var returnValue = this[lastIndex];
+        Array.prototype.splice.call(this, lastIndex, 1);
+        return returnValue;
+    } else if(this.length === undefined || this.length === 0) {
+        this.length = 0;
+        return undefined;
+    }   
+}
+
+tests({
+    'It should remove the last element from the array.': function() {
+        var originalArray = [1, 2, 3];
+        originalArray.myPop();
+        eq(originalArray[2], undefined);
+    },
+    'It should return the last element of the array.': function() {
+        var originalArray = [1, 2, 3];
+        var returnValue = originalArray.myPop();
+        eq(returnValue, 3);
+    },
+    'If called on an empty array, it should return undefined.': function() {
+        var returnValue = [].myPop();
+        eq(returnValue, undefined);
+    },
+    'It should be generic and we should be able to use call/apply.': function() {
+        var originalArray = [];
+        [].myPop.call(this, 1, 2, 3);
+    },
+    'If array is not empty, it should reduce the length of the array by 1.': function() {
+        var originalArray = [1, 2, 3];
+        originalArray.myPop();
+        eq(originalArray.length, 2);
+    },
+    'If method called on an object with a numerical length property greater than 0, it will reduce length by 1.': function() {
+        var randomObject = {
+            length: 5
+        };
+        [].myPop.call(randomObject);
+        eq(randomObject.length, 4);
+    },
+    'It method called on an object with no length property or length property of 0 or NaN, will change length to 0.': function() {
+        var emptyObject = {};
+        [].myPop.call(emptyObject);
+        eq(emptyObject.length, 0);
+    }
+});
+
+</script>

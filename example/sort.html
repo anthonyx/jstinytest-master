@@ -1,0 +1,174 @@
+<script src="../simpletest.js"></script>
+<script>
+
+
+// Prototype Implementation
+
+
+/* Requirements:
+ * Sorts the elements 'in place' and returns the array
+ * The sort is not necessarily stable - ?
+ * Accepts an optional compareFunction
+ * If compareFunction is omitted, it will use the unicode point value according to the string conversion of each element
+ * Returns the sorted array
+ * Array is sorted in place, no copy is created
+ * Will sort holes to the end
+ * Will sort undefined to the end, but before holes
+ * compareFunction(a, b):
+    * if returns negative, a before b
+    * if returns 0, leave as is
+    * if returns positive, b before a
+ */
+
+
+// It needs to compare each array element with the rest and see if it is the lowest.
+// Will first compare the first element to the rest
+// If first element is less than rest, go to second element
+// If first element is not less than rest, change it to the lowest element
+    // How do I do this?
+    // Change the comparison element to the lower one and then keep comparing to the rest of the elements
+// Once it has gone through all elements, return the modified array
+
+// Array.prototype.mySort = function(compareFunction) {
+
+//     var comparisonIndex = 0;
+//     function charCode(input) {
+//         if(input === undefined){
+//             return 65536;
+//         } else {
+//             return String.prototype.charCodeAt.call(input);
+//         }
+//     }
+
+//     // Check if the current element is less than all elements
+//     for(comparisonIndex; comparisonIndex < this.length; comparisonIndex++) {
+//         for(var i = comparisonIndex; i < this.length; i++) {
+//             if(compareFunction) {
+//                 var returnValue = compareFunction(charCode(this[comparisonIndex]), charCode(this[i]));
+//                 if(returnValue > 0) {
+//                     var originalValue = this[comparisonIndex];
+//                     this[comparisonIndex] = this[i];
+//                     this[i] = originalValue;
+//                 }
+//             } else if(charCode(this[comparisonIndex]) > charCode(this[i])) {
+//                 var originalValue = this[comparisonIndex];
+//                 this[comparisonIndex] = this[i];
+//                 this[i] = originalValue;
+//             } else if(charCode(this[comparisonIndex]) === charCode(this[i]) && this[comparisonIndex] !== this[i]) {
+//                 if(this[comparisonIndex] > this[i]) {
+//                     var originalValue = this[comparisonIndex];
+//                     this[comparisonIndex] = this[i];
+//                     this[i] = originalValue;
+//                 }
+//             }
+//         }
+//     }
+
+//     return this;
+// }
+
+Array.prototype.mySort = function(compareFunction) {
+    function charCode(input) {
+        // if undefined, need to skip
+        if(input === undefined) {
+            return input;
+        } else {
+            return String.prototype.charCodeAt.call(input);
+        }
+    }
+
+    for(var comparisonIndex = 0; comparisonIndex < this.length; comparisonIndex++) {
+        for(var i = comparisonIndex + 1; i < this.length; i++) {
+            // Check for compareFunction X
+            // Check for holes in the beginning, middle, and end X
+            // Check for undefined
+
+            // Check for holes
+            if(comparisonIndex in this === false) {
+                this[comparisonIndex] = this[i];
+                delete this[i];
+            } else if(this[comparisonIndex] === undefined && i in this !== false) {
+                var originalValue = this[comparisonIndex];
+                this[comparisonIndex] = this[i];
+                this[i] = originalValue;
+            } else {
+                // Check for compareFunction
+                if(compareFunction) {
+                    var returnValue = compareFunction(charCode(this[comparisonIndex]), charCode(this[i]));
+                    if(returnValue > 0) {
+                        var originalValue = this[comparisonIndex];
+                        this[comparisonIndex] = this[i];
+                        this[i] = originalValue;
+                    }
+                } else {
+                    // Default check
+                    if(charCode(this[comparisonIndex]) > charCode(this[i])) {
+                        var originalValue = this[comparisonIndex];
+                        this[comparisonIndex] = this[i];
+                        this[i] = originalValue;
+
+                    // If char code values are equal and actual values are not equal
+                    } else if(charCode(this[comparisonIndex]) === charCode(this[i]) && this[comparisonIndex] !== this[i]) {
+                        if(this[comparisonIndex] > this[i]) {
+                            var originalValue = this[comparisonIndex];
+                            this[comparisonIndex] = this[i];
+                            this[i] = originalValue;
+                        }
+                    }
+                }
+            }    
+        }
+    }
+
+    return this;
+}
+
+
+tests({
+    'It should return an array.': function() {
+        var returnValue = [1, 2, 3].mySort();
+        eq(Array.isArray(returnValue), true);
+    },
+    'It should return the same array.': function() {
+        var sortArray = [1, 2, 3];
+        var returnValue = sortArray.mySort();
+        eq(sortArray, returnValue);
+    },
+    'By default, it should sort from least to greatest.': function() {
+        var returnValue = [3, 2, 1].mySort();
+        eq(returnValue[0], 1);
+        eq(returnValue[1], 2);
+        eq(returnValue[2], 3);
+    },
+    'It should sort based on character code values.': function() {
+        var returnValue = [10, 1, 3].mySort();
+        eq(returnValue[0], 1);
+        eq(returnValue[1], 10);
+        eq(returnValue[2], 3);
+    },
+    'It should sort holes to the end.': function() {
+        var returnValue = [, 1, 2].mySort();
+        eq(returnValue[0], 1);
+        eq(returnValue[1], 2);
+        eq(2 in returnValue, false);
+    },
+    'It should sort undefined before holes.': function() {
+        var returnValue = [undefined, 3, ,].mySort();
+        eq(returnValue[0], 3);
+        eq(returnValue[1] === undefined && 1 in returnValue === true, true);
+        eq(2 in returnValue, false);
+    },
+    'It should sort numbers first and then string values.': function() {
+        var returnValue = ['what up', 2].mySort();
+        eq(returnValue[0], 2);
+        eq(returnValue[1], 'what up');
+    },
+    'If character codes are equal but values are different, sort based on value from least to greatest.': function() {
+        var returnValue = [100, 10, 1].mySort();
+        eq(returnValue[0], 1);
+        eq(returnValue[1], 10);
+        eq(returnValue[2], 100);
+    }
+});
+
+</script>
