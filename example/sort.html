@@ -93,8 +93,15 @@ Array.prototype.mySort = function(compareFunction) {
                 this[i] = originalValue;
             } else {
                 // Check for compareFunction
+                // if(compareFunction) {
+                //     var returnValue = compareFunction(charCode(this[comparisonIndex]), charCode(this[i]));
+                //     if(returnValue > 0) {
+                //         var originalValue = this[comparisonIndex];
+                //         this[comparisonIndex] = this[i];
+                //         this[i] = originalValue;
+                //     }
                 if(compareFunction) {
-                    var returnValue = compareFunction(charCode(this[comparisonIndex]), charCode(this[i]));
+                    var returnValue = compareFunction(this[comparisonIndex], this[i]);
                     if(returnValue > 0) {
                         var originalValue = this[comparisonIndex];
                         this[comparisonIndex] = this[i];
@@ -168,6 +175,66 @@ tests({
         eq(returnValue[0], 1);
         eq(returnValue[1], 10);
         eq(returnValue[2], 100);
+    },
+    'It should accept an optional compareFunction. If positive, greatest to least.': function() {
+        var returnValue = [1, 2].mySort(function(a, b) {
+            return b - a;
+        });
+        eq(returnValue[0], 2);
+        eq(returnValue[1], 1);
+    },
+    'It should accept an optional compareFunction. If 0, do nothing.': function() {
+        var returnValue = [3, 1, 2].mySort(function(a, b) {
+            return 0;
+        });
+        eq(returnValue[0], 3);
+        eq(returnValue[1], 1);
+        eq(returnValue[2], 2);
+    },
+    'Objects can be sorted, given the value of one of their properties. Test for numeric.': function() {
+        var items = [
+          { name: 'Edward', value: 21 },
+          { name: 'Sharpe', value: 37 },
+          { name: 'And', value: 45 },
+          { name: 'The', value: -12 },
+          { name: 'Magnetic', value: 13 },
+          { name: 'Zeros', value: 37 }
+        ];
+
+        // sort by value
+        items.mySort(function (a, b) {
+          return a.value - b.value;
+        });
+
+        eq(items[0].value, -12);
+        eq(items[5].value, 45);
+    },
+    'Objects can be sorted, given the value of one of their properties. Test for strings.': function() {
+        var items = [
+          { name: 'Edward', value: 21 },
+          { name: 'Sharpe', value: 37 },
+          { name: 'And', value: 45 },
+          { name: 'The', value: -12 },
+          { name: 'Magnetic', value: 13 },
+          { name: 'Zeros', value: 37 }
+        ];
+
+        items.mySort(function(a, b) {
+          var nameA = a.name.toUpperCase(); // ignore upper and lowercase
+          var nameB = b.name.toUpperCase(); // ignore upper and lowercase
+          if (nameA < nameB) {
+            return -1;
+          }
+          if (nameA > nameB) {
+            return 1;
+          }
+
+          // names must be equal
+          return 0;
+        });
+
+        eq(items[0].value, 45);
+        eq(items[5].value, 37);
     }
 });
 
