@@ -7,7 +7,7 @@ Mutator Methods:
 (x) push
 (x) reverse
 (x) shift
-(IP) sort
+(x) sort
 ( ) splice
 ( ) unshift
 
